@@ -16,6 +16,9 @@ const OPEN_FILE = "img/greenSquare.png";
 const DK_SCORE = document.getElementById("dkScr");
 const LT_SCORE = document.getElementById("ltScr");
 const TXT_INPUT = document.querySelector("#input");
+const GT_UTTT = 0;
+const GT_REVERSI = 1;
+const GAME_TYPE = GT_REVERSI;
 
 var board = [
   [],
@@ -41,6 +44,10 @@ var recievedPlayAgain = false;
 var outputMessage = ""
 var displayMessage = false;
 
+//  for Save / Load feature
+var moves = new Array(); //  this holds the player # and the move that player made
+var moveIndex = 0;
+
 function initializeBoard() {
   for (y = 0; y < 8; y++)
     for (x = 0; x < 8; x++) {
@@ -59,12 +66,10 @@ function initializeBoard() {
   boxesTaken = 4;
   shadeBoxes(player);
   winner();
+  moves = [];
+  moveIndex = 0;
 }
 
-
-//  for Save / Load feature
-var moves = new Array(); //  this holds the player # and the move that player made
-var moveIndex = 0;
 
 jQuery(document).ready(function($) {
   initializeBoard();
@@ -137,6 +142,11 @@ function makeMove(game, strId, box, checkWhoseTurn) {
   //document.getElementById(strId).style.backgroundColor = url(colorFile); // paint it player one's color
   board[y][x] = player; //  put this square's id in the array
   boxesTaken++;
+  let id = parseInt(strId);
+  moves[moveIndex++] = {
+    player,
+    id
+  };
   clearShadeBoxes();
   flipSquares(x, y, colorFile);
 
