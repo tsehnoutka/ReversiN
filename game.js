@@ -56,6 +56,7 @@ function initializeBoard() {
   document.getElementById("i43").src = PLAYER2_FILE;
   board[4][4] = PLAYER1;
   document.getElementById("i44").src = PLAYER1_FILE;
+  boxesTaken = 4;
   shadeBoxes(player);
   winner();
 }
@@ -119,7 +120,7 @@ function makeMove(game, strId, box, checkWhoseTurn) {
 
   //  if you are not clicking in an OPEN_SPACE square. exit function
   if (board[y][x] != OPEN_SPACE) {
-    PopUpMessage("Please a valid move ( one of the shaded squares)");
+    PopUpMessage("Please a valid move \n(Click one of the shaded squares)");
     return;
   }
 
@@ -139,6 +140,10 @@ function makeMove(game, strId, box, checkWhoseTurn) {
   clearShadeBoxes();
   flipSquares(x, y, colorFile);
 
+  if (checkWhoseTurn) {
+    SendTurn(strId);
+  }
+
   if (winner()) {
     PopUpMessage("press reset to Play again");
     return;
@@ -150,11 +155,6 @@ function makeMove(game, strId, box, checkWhoseTurn) {
   //  set next turn color
   let color = (player == PLAYER1) ? PLAYER1_COLOR : PLAYER2_COLOR;
   document.getElementById("turnbox").style.backgroundColor = color;
-
-  if (checkWhoseTurn) {
-    SendTurn(strId);
-  }
-  //document.getElementById('Undo').disabled = false;
 } //  end make move  function
 
 /*******************************************************************************
@@ -241,122 +241,139 @@ function shadeBoxes(player) {
       if (board[y][x] == player) {
         //  check in each direction for other player and open spot
         // left
-        i = x - 1;
-        count = 0;
-        while (board[y][i] == otherPlayer && i >= 0) {
-          i--;
-          count++;
+        if (x != 0) {
+          i = x - 1;
+          count = 0;
+          while (i >= 0 && board[y][i] == otherPlayer) {
+            i--;
+            count++;
+          }
+          if (i >= 0 && count && board[y][i] == UNPLAYABLE) {
+            let tmpID = "i" + y + "" + i;
+            board[y][i] = OPEN_SPACE;
+            document.getElementById(tmpID).src = colorFile;
+          }
+          totCount += count;
         }
-        if (count && board[y][i] == UNPLAYABLE) {
-          let tmpID = "i" + y + "" + i;
-          board[y][i] = OPEN_SPACE;
-          document.getElementById(tmpID).src = colorFile;
-        }
-        totCount += count;
 
         // right
-        i = x + 1;
-        count = 0;
-        while (board[y][i] == otherPlayer && i < 8) {
-          i++;
-          count++;
+        if (x != 7) {
+          i = x + 1;
+          count = 0;
+          while (i < 8 && board[y][i] == otherPlayer) {
+            i++;
+            count++;
+          }
+          if (i < 8 && count && board[y][i] == UNPLAYABLE) {
+            let tmpID = "i" + y + "" + i;
+            board[y][i] = OPEN_SPACE;
+            document.getElementById(tmpID).src = colorFile;
+          }
+          totCount += count;
         }
-        if (count && board[y][i] == UNPLAYABLE) {
-          let tmpID = "i" + y + "" + i;
-          board[y][i] = OPEN_SPACE;
-          document.getElementById(tmpID).src = colorFile;
-        }
-        totCount += count;
 
         // up
-        j = y - 1;
-        count = 0;
-        while (board[j][x] == otherPlayer && j >= 0) {
-          j--;
-          count++;
+        if (y != 0) {
+          j = y - 1;
+          count = 0;
+          while (j >= 0 && board[j][x] == otherPlayer) {
+            j--;
+            count++;
+          }
+          if (j >= 0 && count && board[j][x] == UNPLAYABLE) {
+            let tmpID = "i" + j + "" + x;
+            board[j][x] = OPEN_SPACE;
+            document.getElementById(tmpID).src = colorFile;
+          }
+          totCount += count;
         }
-        if (count && board[j][x] == UNPLAYABLE) {
-          let tmpID = "i" + j + "" + x;
-          board[j][x] = OPEN_SPACE;
-          document.getElementById(tmpID).src = colorFile;
-        }
-        totCount += count;
 
         // down
-        j = y + 1;
-        count = 0;
-        while (board[j][x] == otherPlayer && j < 8) {
-          j++;
-          count++;
+        if (y != 7) {
+          j = y + 1;
+          count = 0;
+          while (j < 8 && board[j][x] == otherPlayer) {
+            j++;
+            count++;
+          }
+          if (j < 8 && count && board[j][x] == UNPLAYABLE) {
+            let tmpID = "i" + j + "" + x;
+            board[j][x] = OPEN_SPACE;
+            document.getElementById(tmpID).src = colorFile;
+          }
+          totCount += count;
         }
-        if (count && board[j][x] == UNPLAYABLE) {
-          let tmpID = "i" + j + "" + x;
-          board[j][x] = OPEN_SPACE;
-          document.getElementById(tmpID).src = colorFile;
-        }
-        totCount += count;
 
         // upper left
-        i = x - 1;
-        j = y - 1;
-        count = 0;
-        while (board[j][i] == otherPlayer && j >= 0 && i >= 0) {
-          j--;
-          i--;
-          count++;
+        if (x != 0 && y != 0) {
+          i = x - 1;
+          j = y - 1;
+          count = 0;
+          while (j >= 0 && i >= 0 && board[j][i] == otherPlayer) {
+            j--;
+            i--;
+            count++;
+          }
+          if (j >= 0 && i >= 0 && count && board[j][i] == UNPLAYABLE) {
+            let tmpID = "i" + j + "" + i;
+            board[j][i] = OPEN_SPACE;
+            document.getElementById(tmpID).src = colorFile;
+          }
+          totCount += count;
         }
-        if (count && board[j][i] == UNPLAYABLE) {
-          let tmpID = "i" + j + "" + i;
-          board[j][i] = OPEN_SPACE;
-          document.getElementById(tmpID).src = colorFile;
-        }
-        totCount += count;
 
         // upper right
-        i = x + 1;
-        j = y - 1;
-        count = 0;
-        while (board[j][i] == otherPlayer && j >= 0 && i < 8) {
-          j--;
-          i++;
-          count++;
+        if (x != 7 && y != 0) {
+          i = x + 1;
+          j = y - 1;
+          count = 0;
+          while (j >= 0 && i < 8 && board[j][i] == otherPlayer) {
+            j--;
+            i++;
+            count++;
+          }
+          if (j >= 0 && i < 8 && count && board[j][i] == UNPLAYABLE) {
+            let tmpID = "i" + j + "" + i;
+            board[j][i] = OPEN_SPACE;
+            document.getElementById(tmpID).src = colorFile;
+          }
+          totCount += count;
         }
-        if (count && board[j][i] == UNPLAYABLE) {
-          let tmpID = "i" + j + "" + i;
-          board[j][i] = OPEN_SPACE;
-          document.getElementById(tmpID).src = colorFile;
-        }
-        totCount += count;
 
         // lower left
-        i = x - 1;
-        j = y + 1;
-        count = 0;
-        while (board[j][i] == otherPlayer && j < 8 && i >= 0) {
-          j++;
-          i--;
-          count++;
+        if (x != 0 && y != 7) {
+          i = x - 1;
+          j = y + 1;
+          count = 0;
+          while (j < 8 && i >= 0 && board[j][i] == otherPlayer) {
+            j++;
+            i--;
+            count++;
+          }
+          if (j < 8 && i >= 0 && count && board[j][i] == UNPLAYABLE) {
+            let tmpID = "i" + j + "" + i;
+            board[j][i] = OPEN_SPACE;
+            document.getElementById(tmpID).src = colorFile;
+          }
+          totCount += count;
         }
-        if (count && board[j][i] == UNPLAYABLE) {
-          let tmpID = "i" + j + "" + i;
-          board[j][i] = OPEN_SPACE;
-          document.getElementById(tmpID).src = colorFile;
-        }
-        totCount += count;
 
         // lower right
-        i = x + 1;
-        j = y + 1;
-        count = 0;
-        while (board[j][i] == otherPlayer && j < 8 && i < 8) {
-          j++;
-          i++;
-          count++;
-        }
-        if (count && board[j][i] == UNPLAYABLE) {
-          let tmpID = "i" + j + "" + i;
-          board[j][i] = OPEN_SPACE;
-          document.getElementById(tmpID).src = colorFile;
+        if (x != 7 && y != 7) {
+          i = x + 1;
+          j = y + 1;
+          count = 0;
+          while (j < 8 && i < 8 && board[j][i] == otherPlayer) {
+            j++;
+            i++;
+            count++;
+          }
+          if (j < 8 && i < 8 && count && board[j][i] == UNPLAYABLE) {
+            let tmpID = "i" + j + "" + i;
+            board[j][i] = OPEN_SPACE;
+            document.getElementById(tmpID).src = colorFile;
+          }
+          totCount += count;
         }
       } //  end if player
     }
@@ -478,6 +495,7 @@ function flipSquares(x, y, color) {
   i = x - 1;
   j = y - 1;
   found = false;
+  opCount = 0; //  the number of oponent squares inbetween mine
   while (j >= 0 && i >= 0 && !found) {
     if (board[j][i] == player)
       found = true;
@@ -489,7 +507,7 @@ function flipSquares(x, y, color) {
   if (found) {
     i += 2; //  remove the decrement from above and move one more to the right
     j += 2; //  remove the decrement from above and move one more to the down
-    if (j - y == opCount)
+    if (y - j == opCount)
       for (j, i; j < y && i < x; j++, i++) {
         flipSquare(j, i, color);
       }
@@ -499,6 +517,7 @@ function flipSquares(x, y, color) {
   i = x + 1;
   j = y - 1;
   found = false;
+  opCount = 0; //  the number of oponent squares inbetween mine
   while (j >= 0 && i < 8 && !found) {
     if (board[j][i] == player)
       found = true;
@@ -510,7 +529,7 @@ function flipSquares(x, y, color) {
   if (found) {
     i -= 2; //  remove the increment from above and move one more to the left
     j += 2; //  remove the decrement from above and move one more to the down
-    if (j - y == opCount)
+    if (y - j == opCount)
       for (j, i; j < y && i > x; j++, i--) {
         flipSquare(j, i, color);
       }
@@ -519,6 +538,7 @@ function flipSquares(x, y, color) {
   i = x - 1;
   j = y + 1;
   found = false;
+  opCount = 0; //  the number of oponent squares inbetween mine
   while (j < 8 && i >= 0 && !found) {
     if (board[j][i] == player)
       found = true;
@@ -539,6 +559,7 @@ function flipSquares(x, y, color) {
   i = x + 1;
   j = y + 1;
   found = false;
+  opCount = 0; //  the number of oponent squares inbetween mine
   while (j < 8 && i < 8 && !found) {
     if (board[j][i] == player)
       found = true;
