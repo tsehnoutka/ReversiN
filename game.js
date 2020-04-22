@@ -2,6 +2,7 @@
 //                           Game stuff
 //****************************************************************************
 //  Variables
+const BTN_PLAYAGAIN = document.querySelector("#playagain");
 const PLAYER1 = 0;
 const PLAYER2 = 1;
 const OPEN_SPACE = -1;
@@ -36,7 +37,7 @@ var boxesTaken = 0;
 var won = false;
 var displayMessage = false;
 var twoNoMovesInARow = 0;
-var gameOn = true;
+var gameOn = false;
 
 var done = false;
 var yourTurn = false;
@@ -66,8 +67,15 @@ function initializeBoard() {
   boxesTaken = 4;
   shadeBoxes(player);
   winner();
+  player = PLAYER1; // 0 for player 1, 1 for player 2
+  boxesTaken = 0;
+  won = false;
+  displayMessage = false;
+  twoNoMovesInARow = 0;
   moves = [];
   moveIndex = 0;
+  color = (player == PLAYER1) ? PLAYER1_COLOR : PLAYER2_COLOR;
+  document.getElementById("turnbox").style.backgroundColor = color;
 }
 
 
@@ -194,8 +202,8 @@ function winner() {
     if (p1Count == p2Count)
       PopUpMessage("It's a tie!");
     retVal = true;
-  } else if (twoNoMovesInARow == 2) {
-    PopUpMessage("Now More Valid moves");
+  }
+  if (twoNoMovesInARow == 2) {
     if (p1Count > p2Count)
       PopUpMessage("Dark Player won");
     if (p1Count < p2Count)
@@ -226,7 +234,7 @@ function clearShadeBoxes() {
 /*******************************************************************************
  **    Shadeboxes
  *******************************************************************************/
-function shadeBoxes(player) {
+function shadeBoxes() {
   /*  Valid Moves
   Dark must place a piece with the dark side up on the board, in such a position
   that there exists at least one straight (horizontal, vertical, or diagonal)
@@ -242,10 +250,12 @@ function shadeBoxes(player) {
   */
   const otherPlayer = (player ^ PLAYER1) ? PLAYER1 : PLAYER2;
   const colorFile = (player == PLAYER1) ? PLAYER1_SHADE_FILE : PLAYER2_SHADE_FILE;
-  let totCount = 0; // the number of valid moves
+  let totShadedCount = 0; // the number of valid moves
   let count = 0;
   let x = 0;
   let y = 0;
+  let i = 0;
+  let j = 0;
   for (y = 0; y < 8; y++)
     for (x = 0; x < 8; x++) {
       if (board[y][x] == player) {
@@ -262,8 +272,8 @@ function shadeBoxes(player) {
             let tmpID = "i" + y + "" + i;
             board[y][i] = OPEN_SPACE;
             document.getElementById(tmpID).src = colorFile;
+            totShadedCount++;
           }
-          totCount += count;
         }
 
         // right
@@ -278,8 +288,8 @@ function shadeBoxes(player) {
             let tmpID = "i" + y + "" + i;
             board[y][i] = OPEN_SPACE;
             document.getElementById(tmpID).src = colorFile;
+            totShadedCount++;
           }
-          totCount += count;
         }
 
         // up
@@ -294,8 +304,8 @@ function shadeBoxes(player) {
             let tmpID = "i" + j + "" + x;
             board[j][x] = OPEN_SPACE;
             document.getElementById(tmpID).src = colorFile;
+            totShadedCount++;
           }
-          totCount += count;
         }
 
         // down
@@ -310,8 +320,8 @@ function shadeBoxes(player) {
             let tmpID = "i" + j + "" + x;
             board[j][x] = OPEN_SPACE;
             document.getElementById(tmpID).src = colorFile;
+            totShadedCount++;
           }
-          totCount += count;
         }
 
         // upper left
@@ -328,8 +338,8 @@ function shadeBoxes(player) {
             let tmpID = "i" + j + "" + i;
             board[j][i] = OPEN_SPACE;
             document.getElementById(tmpID).src = colorFile;
+            totShadedCount++;
           }
-          totCount += count;
         }
 
         // upper right
@@ -346,8 +356,8 @@ function shadeBoxes(player) {
             let tmpID = "i" + j + "" + i;
             board[j][i] = OPEN_SPACE;
             document.getElementById(tmpID).src = colorFile;
+            totShadedCount++;
           }
-          totCount += count;
         }
 
         // lower left
@@ -364,8 +374,8 @@ function shadeBoxes(player) {
             let tmpID = "i" + j + "" + i;
             board[j][i] = OPEN_SPACE;
             document.getElementById(tmpID).src = colorFile;
+            totShadedCount++;
           }
-          totCount += count;
         }
 
         // lower right
@@ -382,14 +392,23 @@ function shadeBoxes(player) {
             let tmpID = "i" + j + "" + i;
             board[j][i] = OPEN_SPACE;
             document.getElementById(tmpID).src = colorFile;
+            totShadedCount++;
           }
-          totCount += count;
         }
       } //  end if player
     }
-  if (totCount == 0)
+  if (totShadedCount == 0) {
     twoNoMovesInARow++
-  else
+    if (twoNoMovesInARow == 1) {
+      PopUpMessage("Now More Valid moves for Player " + (player + 1));
+      player = (player ^ PLAYER1) ? PLAYER1 : PLAYER2;
+      shadeBoxes(player);
+      if (twoNoMovesInARow == 2) {
+        PopUpMessage("Now More Valid moves");
+        winner();
+      }
+    }
+  } else
     twoNoMovesInARow = 0;
 
 } //end shade Boxes
@@ -397,13 +416,17 @@ function shadeBoxes(player) {
 /*******************************************************************************
  **    Reset
  *******************************************************************************/
-function Reset() {
-  boxesTaken = 0;
-  won = false;
-  displayMessage = false;
-  twoNoMovesInARow = 0;
+function onPlayAgain() {
+  console.log("New Game");
+  //  need to send a message to the opponenet and all they
+  //  should do is call this function
+  if (!recievedPlayAgain)
+    sendPlayAgain();
+  recievedPlayAgain = false;
+
   initializeBoard();
 }
+BTN_PLAYAGAIN.addEventListener("click", onPlayAgain, false);
 
 /*******************************************************************************
  **    flipSquares
